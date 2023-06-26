@@ -1,0 +1,11 @@
+.idea/
+
+# dependencies
+/node_modules
+
+# production
+/dist
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
