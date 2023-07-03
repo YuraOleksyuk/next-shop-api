@@ -31,7 +31,7 @@ const swaggerOptions = {
     ],
     components: {
       schemas: {
-        category: m2s(CategorySchema, { omitFields: ['_id', 'createdAt', 'updatedAt'] }),
+        category: m2s(CategorySchema, { omitFields: ['createdAt', 'updatedAt'] }),
         product: m2s(ProductSchema, { omitFields: ['createdAt', 'updatedAt'] }),
       }
     }

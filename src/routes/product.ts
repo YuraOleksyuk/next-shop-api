@@ -2,7 +2,8 @@ import express from 'express';
 
 const productRouter = express.Router();
 import ProductSchema from "../models/Product";
-import mongoose from "mongoose";
+import mongoose, {isValidObjectId} from "mongoose";
+import CategorySchema from "../models/Category";
 
 const productPath = '/product';
 
@@ -12,13 +13,53 @@ const productPath = '/product';
  *   get:
  *     tags: [Product]
  *     description: Welcome to swagger-jsdoc!
+ *     parameters:
+ *       - in: query
+ *         name: categoryId
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: Provide categoryId to return products related to category
+ *       - in: query
+ *         name: categorySlug
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: Provide categorySlug to return products related to category
  *     responses:
  *       200:
  *         description: Returns a mysterious string.
  */
 productRouter.get(productPath, async (req, res) => {
+  console.log('categoryId > ', req.query.categoryId)
   try {
-    const products = await ProductSchema.find({})
+    let querySchema = {};
+    
+    const categoryId = req.query.categoryId;
+    const categorySlug = req.query.categorySlug;
+    
+    if (categoryId) {
+      if (!isValidObjectId(categoryId)) {
+        res.status(404).json({ message: 'Typo in categoryId' })
+        return;
+      }
+      
+      querySchema = {
+        category: categoryId
+      };
+    }
+    
+    if (categorySlug) {
+      const category = await CategorySchema.findOne({slug: categorySlug})
+      
+      if (category) {
+        querySchema = {
+          category: category.id
+        }
+      }
+    }
+    
+    const products = await ProductSchema.find(querySchema);
     res.status(200).json(products);
   } catch (err) {
     res.status(500).json(err);
@@ -27,18 +68,25 @@ productRouter.get(productPath, async (req, res) => {
 
 /**
  * @swagger
- * /api/product/slug/:slug:
+ * /api/product/slug:
  *   get:
  *     tags: [Product]
  *     description: Get product by slug.
+ *     parameters:
+ *       - in: query
+ *         name: slug
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Slug of the product to get Product
  *     responses:
  *       200:
  *         description: Returns product related to slug.
  *       404:
  *         description: Product not found.
  */
-productRouter.get(`${productPath}/slug/:slug`, async (req, res) => {
-  const productSlug = req.params.slug;
+productRouter.get(`${productPath}/slug`, async (req, res) => {
+  const productSlug = req.query.slug;
 
   try {
     const product = await ProductSchema.findOne({ slug: productSlug });
