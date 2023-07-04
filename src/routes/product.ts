@@ -51,6 +51,11 @@ productRouter.get(productPath, async (req, res) => {
     
     if (categorySlug) {
       const category = await CategorySchema.findOne({slug: categorySlug})
+
+      if (category === null) {
+        res.status(404).json({message: 'Not Found'});
+        return;
+      }
       
       if (category) {
         querySchema = {
@@ -92,7 +97,7 @@ productRouter.get(`${productPath}/slug`, async (req, res) => {
     const product = await ProductSchema.findOne({ slug: productSlug });
 
     if (product === null) {
-      res.status(404).json(product);
+      res.status(404).json({message: 'Not Found'});
       return;
     }
 
