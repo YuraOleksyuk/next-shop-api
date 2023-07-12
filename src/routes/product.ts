@@ -31,7 +31,6 @@ const productPath = '/product';
  *         description: Returns a mysterious string.
  */
 productRouter.get(productPath, async (req, res) => {
-  console.log('categoryId > ', req.query.categoryId)
   try {
     let querySchema = {};
     
