@@ -5,6 +5,7 @@
   "main": "src/main.ts",
   "scripts": {
     "build": "rimraf dist && npx tsc",
+    "start": "node dist/main.js",
     "dev": "npx nodemon"
   },
   "author": "",
