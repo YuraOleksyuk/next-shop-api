@@ -42,7 +42,7 @@ categoryRouter.get(categoryPath, async (req, res) => {
  *         description: Returns created category.
  */
 categoryRouter.post(categoryPath, async (req, res) => {
-  console.log('req.body > ', req.body);
+
   const newCategory = new CategorySchema({
     title: req.body.title,
     slug: req.body.slug,

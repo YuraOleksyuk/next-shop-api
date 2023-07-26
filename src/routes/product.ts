@@ -1,9 +1,15 @@
 import express from 'express';
 
 const productRouter = express.Router();
-import ProductSchema from "../models/Product";
-import mongoose, {isValidObjectId} from "mongoose";
-import CategorySchema from "../models/Category";
+
+import {
+  createProduct,
+  deleteProductByID,
+  getAllProducts,
+  getProductByCategorySlug,
+  getProductBySlug,
+  updateProductById
+} from "../controllers/product.controller";
 
 const productPath = '/product';
 
@@ -30,81 +36,49 @@ const productPath = '/product';
  *       200:
  *         description: Returns a mysterious string.
  */
-productRouter.get(productPath, async (req, res) => {
-  try {
-    let querySchema = {};
-    
-    const categoryId = req.query.categoryId;
-    const categorySlug = req.query.categorySlug;
-    
-    if (categoryId) {
-      if (!isValidObjectId(categoryId)) {
-        res.status(404).json({ message: 'Typo in categoryId' })
-        return;
-      }
-      
-      querySchema = {
-        category: categoryId
-      };
-    }
-    
-    if (categorySlug) {
-      const category = await CategorySchema.findOne({slug: categorySlug})
-
-      if (category === null) {
-        res.status(404).json({message: 'Not Found'});
-        return;
-      }
-      
-      if (category) {
-        querySchema = {
-          category: category.id
-        }
-      }
-    }
-    
-    const products = await ProductSchema.find(querySchema);
-    res.status(200).json(products);
-  } catch (err) {
-    res.status(500).json(err);
-  }
-});
+productRouter.get(productPath, getAllProducts);
 
 /**
  * @swagger
- * /api/product/slug:
+ * /api/product/category-slug/{slug}:
+ *   get:
+ *     tags: [Product]
+ *     description: Get products by category slug.
+ *     parameters:
+ *       - in: path
+ *         name: slug
+ *         required: true
+ *         description: Returns products array related to category (slug)
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Returns products array related to category (slug).
+ *       404:
+ *         description: Products not found.
+ */
+productRouter.get(`${productPath}/category-slug/:slug`, getProductByCategorySlug);
+
+/**
+ * @swagger
+ * /api/product/slug/{slug}:
  *   get:
  *     tags: [Product]
  *     description: Get product by slug.
  *     parameters:
- *       - in: query
+ *       - in: path
  *         name: slug
+ *         required: true
+ *         description: Single product slug to get Product
  *         schema:
  *           type: string
- *         required: true
- *         description: Slug of the product to get Product
  *     responses:
  *       200:
  *         description: Returns product related to slug.
  *       404:
  *         description: Product not found.
  */
-productRouter.get(`${productPath}/slug`, async (req, res) => {
-  const productSlug = req.query.slug;
-
-  try {
-    const product = await ProductSchema.findOne({ slug: productSlug });
-
-    if (product === null) {
-      res.status(404).json({message: 'Not Found'});
-      return;
-    }
-
-    res.status(200).json(product);
-  } catch (err) {
-    res.status(500).json(err);
-  }
-});
+productRouter.get(`${productPath}/slug/:slug`, getProductBySlug);
 
 /**
  * @openapi
@@ -124,42 +98,44 @@ productRouter.get(`${productPath}/slug`, async (req, res) => {
  *       200:
  *         description: Returns created product.
  */
-productRouter.post(productPath, async (req, res) => {
-  const newProduct = new ProductSchema({
-    title: req.body.title,
-    description: req.body.description,
-    thumb: req.body.thumb,
-    category: req.body.category,
-    size: req.body.size,
-    color: req.body.color,
-    price: req.body.price,
-    slug: req.body.slug
-  })
+productRouter.post(productPath, createProduct);
 
-  try {
-    const savedProduct = await newProduct.save();
-    res.status(200).json(savedProduct);
-  } catch (err) {
-    res.status(500).json(err);
-  }
+/**
+ * @openapi
+ * /api/product/{id}:
+ *   delete:
+ *     tags: [Product]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Product ID.
+ *         schema:
+ *           type: string
+ *     description: Delete product by ID.
+ *     responses:
+ *       200:
+ *         description: Returns deleted product.
+ */
+productRouter.delete(`${productPath}/:id`, deleteProductByID);
 
-});
-
-productRouter.delete(`${productPath}/:id`, async (req, res) => {
-  try {
-    const productId = req.params.id;
-    const deletedProduct = await ProductSchema.deleteOne({ _id: productId });
-    res.status(200).json(deletedProduct);
-  } catch (err) {
-    res.status(500).json(err);
-  }
-})
-
-productRouter.put(`${productPath}/:id`, async (req, res) => {
-  const productId: string = req.params.id;
-
-  console.log('productID > ', productId);
-  // Product.updateOne(productId, )
-})
+/**
+ * @openapi
+ * /api/product/{id}:
+ *   put:
+ *     tags: [Product]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Single product slug to get Product
+ *         schema:
+ *           type: string
+ *     description: Create new product.
+ *     responses:
+ *       200:
+ *         description: Returns created product.
+ */
+productRouter.put(`${productPath}/:id`, updateProductById)
 
 export default productRouter;

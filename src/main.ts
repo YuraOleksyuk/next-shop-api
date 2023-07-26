@@ -1,6 +1,8 @@
 import express from 'express';
-import serverless from 'serverless-http'
-import * as path from 'path';
+import serverless from 'serverless-http';
+
+import 'dotenv/config';
+
 import * as mongoose from "mongoose";
 import bodyParser from "body-parser";
 
@@ -14,8 +16,10 @@ import swaggerUi from 'swagger-ui-express';
 
 import CategorySchema from './models/Category';
 import ProductSchema from './models/Product';
+import OrderSchema from './models/Order';
 
-const port = process.env.PORT || 3333;
+
+const port: string | number = process.env.PORT || 3333;
 
 const swaggerOptions = {
   definition: {
@@ -33,6 +37,7 @@ const swaggerOptions = {
       schemas: {
         category: m2s(CategorySchema, { omitFields: ['createdAt', 'updatedAt'] }),
         product: m2s(ProductSchema, { omitFields: ['createdAt', 'updatedAt'] }),
+        order: m2s(OrderSchema, { omitFields: [] }),
       }
     }
   },
@@ -40,7 +45,7 @@ const swaggerOptions = {
 }
 
 mongoose
-  .connect('mongodb+srv://shop-admin:shop-admin@shop-db.riovzfy.mongodb.net/?retryWrites=true&w=majority')
+  .connect(`mongodb+srv://${process.env.DB_LOGIN}:${process.env.DB_PASSWORD}@shop-db.riovzfy.mongodb.net/?retryWrites=true&w=majority`)
   .then(() => {
     console.log('DB Connected!')
   })
