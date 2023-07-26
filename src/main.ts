@@ -31,7 +31,10 @@ const swaggerOptions = {
     servers: [
       {
         url: `http://localhost:${port}/`
-      }
+      },
+      {
+        url: `https://next-shop-api-ebecff00f8b9.herokuapp.com/`
+      },
     ],
     components: {
       schemas: {
