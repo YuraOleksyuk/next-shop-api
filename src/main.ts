@@ -1,5 +1,6 @@
 import express from 'express';
 import serverless from 'serverless-http';
+import cors from 'cors';
 
 import 'dotenv/config';
 
@@ -17,6 +18,7 @@ import swaggerUi from 'swagger-ui-express';
 import CategorySchema from './models/Category';
 import ProductSchema from './models/Product';
 import OrderSchema from './models/Order';
+import orderRouter from "./routes/order";
 
 
 const port: string | number = process.env.PORT || 3333;
@@ -58,6 +60,8 @@ mongoose
 
 const app = express();
 
+app.use(cors());
+
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(bodyParser.json());
@@ -71,6 +75,7 @@ app.get('/', (req, res) => {
 app.use('/api', userRouter);
 app.use('/api', productRouter);
 app.use('/api', categoryRouter);
+app.use('/api', orderRouter);
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerJSDoc(swaggerOptions)));
 

@@ -1,7 +1,7 @@
 import express from "express";
 import {createOrder} from "../controllers/order.controller";
 
-const orderRouter = express.router();
+const orderRouter = express.Router();
 const orderPath = '/order';
 
 

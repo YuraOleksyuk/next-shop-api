@@ -2,12 +2,11 @@ import * as mongoose from "mongoose";
 
 const OrderSchema = new mongoose.Schema(
   {
-    userInfo: {
+    accountData: {
       type: Object,
       required: true,
-      unique: true
     },
-    products: [
+    shoppingCart: [
       {
         productId: {
           type: mongoose.Schema.Types.ObjectId,
@@ -18,7 +17,7 @@ const OrderSchema = new mongoose.Schema(
         }
       }
     ],
-    address: {
+    shippingData: {
       type: Object,
       required: true
     },
